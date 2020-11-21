@@ -1,0 +1,52 @@
+---
+- name: Check Uptime Before Patching
+  shell: uptime
+  register: pre_uptime
+
+- name: Get prepatch versions
+  set_fact:
+    pre_patch_dist: "{{ansible_distribution_version}}"
+    pre_patch_kern: "{{ansible_kernel}}"
+
+- name: Get Enabled Repos
+  shell: yum repolist enabled | grep -Ev 'Updating|repo id' | awk '{print $1}'
+  args:
+    executable: /bin/bash
+    warn: no
+  register: repo_list
+
+- name: Display Variables
+  debug:
+    var: repo_list.stdout_lines 
+    verbosity: 1
+
+- name: Disable Repositories
+  shell: "yum-config-manager --disable {{item}}"
+  loop:
+    "{{ repo_list.stdout_lines}}"
+  args:
+    executable: /bin/bash
+    warn: no
+  notify: yum-clean-metadata
+
+- name: Enable RHEL 7 System Repositories
+  shell: "yum-config-manager --enable {{item}}"
+  loop:
+    "{{rhel7_repos}}"
+  args:
+    executable: /bin/bash
+    warn: no
+  when: ansible_os_family == "RedHat" and ansible_distribution_major_version == "7"
+  notify: yum-clean-metadata
+
+- name: Enable RHEL 8 System Repositories
+  shell: "yum-config-manager --enable {{item}}"
+  loop:
+    "{{rhel8_repos}}"
+  args:
+    executable: /bin/bash
+    warn: no
+  when: ansible_os_family == "RedHat" and ansible_distribution_major_version == "8"
+  notify: yum-clean-metadata
+
+
