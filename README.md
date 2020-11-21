@@ -1,7 +1,7 @@
 Role Name
 =========
+Pre_Patch - Pre-patch tasks to be run prior to patching a RHEL O/S image.
 
-A brief description of the role goes here.
 
 Requirements
 ------------
@@ -36,4 +36,3 @@ Author Information
 ------------------
 
 An optional section for the role authors to include contact information, or a website (HTML is not allowed).
-# Reboot_OS
